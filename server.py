@@ -7,7 +7,7 @@ import cv2
 import threading
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind(('192.168.0.107', 9999)) # Enter your ip address in '#'
+sock.bind(('#', 9999)) # Enter your ip address in '#'
 print('Waiting for connection ...')
 sock.listen(1)
 
@@ -46,7 +46,7 @@ def file_upload(filename):
 
 def convert_byte_stream():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(('192.168.0.107', 9998)) # Enter your ip address in '#'
+    sock.bind(('#', 4444)) # Enter your ip address in '#'
     sock.listen(5)
     connect = sock.accept()
     target = connect[0]
