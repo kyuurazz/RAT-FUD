@@ -9,8 +9,10 @@ RAT-FUD stands for Remote Access Trojan-Fully Undetectable or Remote Administrat
 - Virtual machine detection
 - Download/Upload files to and from the target system
 - Keylogger with options to view status, start, stop and dump the logs onto your host system
-- Open Webcam
+- Webcam
 - Screenshots
+- Screen Record
+- Persistence
 
 ## Getting Started
 ### Install
@@ -21,7 +23,7 @@ $ cd RAR-FUD
 $ pip install -r requirement.txt
 $ python3 server.py
 ```
-suggestion: change the <b>backdoor.py</b> file to <b>backdoor.exe</b> with the auto-py-to-exe tool, after that send file to target.
+suggestion: Rename the file backdoor.py so it's not detected as a virus by Windows <b>[example: manager.py]</b>. and change the file extension <b>.py to .exe</b> using the <b>auto-py-to-exe</b> tool, after that send file to target.
 ```shell
 https://github.com/brentvollebregt/auto-py-to-exe
 ```

